@@ -3,39 +3,43 @@ var scl = 25;
 var food;
 var fps = 12;
 var score = 0;
-var maxscore=0;
-var timer=0;
-gameStarted= false;
-timerStarted= false;
+var maxscore = 0;
+var timer = 0;
+gameStarted = false;
+timerStarted = false;
 
 function setup() {
    createCanvas(600, 600);
    snake = new Snake();
    pickLocation();
 }
-function timeIt(){
-   timer ++;
- }
 
-// function playPause() {
-//       if (snake.isPaused == true) {
-//       if (snake.direction == 'up') {
-//          snake.dir(0, -1);
-//          snake.isPaused = false;
-//       } else if (snake.direction == 'down') {
-//          snake.dir(0, 1);
-//          snake.isPaused = false;
-//       } else if (snake.direction == 'left') {
-//          snake.dir(-1, 0);
-//          snake.isPaused = false;
-//       } else if (snake.direction == 'right') {
-//          snake.dir(1, 0);
-//          snake.isPaused = false;
-//       }
-//    } else if (snake.isPaused == false) {
-//       snake.dir(0, 0);
-//       snake.isPaused = true;}
-// }
+function timeIt() {
+   if (snake.isPaused == false) {
+      timer++;
+   }
+}
+
+function playPause() {
+   if (snake.isPaused == true) {
+      if (snake.direction == 'up') {
+         snake.dir(0, -1);
+         snake.isPaused = false;
+      } else if (snake.direction == 'down') {
+         snake.dir(0, 1);
+         snake.isPaused = false;
+      } else if (snake.direction == 'left') {
+         snake.dir(-1, 0);
+         snake.isPaused = false;
+      } else if (snake.direction == 'right') {
+         snake.dir(1, 0);
+         snake.isPaused = false;
+      }
+   } else if (snake.isPaused == false) {
+      snake.dir(0, 0);
+      snake.isPaused = true;
+   }
+}
 
 function pickLocation() {
    var cols = floor(width / scl);
@@ -50,22 +54,23 @@ function draw() {
    fill(32);
    rect(0, height - scl, width, scl);
    fill(255);
+   textSize(12);
    text("Score: " + score, scl, height - scl / 3);
    if (score > maxscore) {
       maxscore = score;
    }
-   text("Max: " + maxscore, 10 * scl, height - scl / 3);
+   text("Best: " + maxscore, 10 * scl, height - scl / 3);
 
-   if (gameStarted==true && snake.isPaused==false && timerStarted==false){
+   if (gameStarted == true && snake.isPaused == false && timerStarted == false) {
       setInterval(timeIt, 1000);
-      timerStarted= true;
-      }
-      
-   if (timer<60){
-   text("Time : " + timer +"s",width- 4*scl,height-scl/3);
+      timerStarted = true;
    }
-   if (timer>=60){
-      text("Time : " +floor(timer/60)+" min "+ timer%60 +"s",width- 4*scl,height-scl/3);
+
+   if (timer < 60) {
+      text("Time : " + timer + "s", width - 4 * scl, height - scl / 3);
+   }
+   if (timer >= 60) {
+      text("Time : " + floor(timer / 60) + " min " + timer % 60 + "s", width - 4 * scl, height - scl / 3);
    }
    if (snake.eat(food)) {
       pickLocation();
@@ -74,21 +79,29 @@ function draw() {
    }
 
    snake.death();
-   snake.show();
-   snake.update();
-
-   fill(255, 0, 100);
-   rect(food.x, food.y, scl, scl);
+   if (snake.isPaused == false) {
+      snake.show();
+      snake.update();
+      fill(255, 0, 100);
+      rect(food.x, food.y, scl, scl);
+   } else  if (snake.isPaused===true && gameStarted===true) {
+      fill(25);
+      tint(25, 127);
+      rect(0, height/3, width, height/3);
+      fill(80 + sin(frameCount*0.25)*56);
+      textSize(111);
+      text("PAUSED",width/8, (height+3*scl)/2);
+}
 
 }
 
 function keyPressed() {
-   if (keyCode === UP_ARROW && snake.direction != "down") {
+   if ((keyCode === UP_ARROW || keyCode ===90 ) && snake.direction != "down") {
       snake.dir(0, -1);
       snake.direction = "up";
       snake.isPaused = false;
       gameStarted = true;
-      
+
 
    } else if (keyCode === DOWN_ARROW && snake.direction != "up") {
       snake.dir(0, 1);
@@ -173,7 +186,7 @@ function Snake() {
       if (this.y > 0 - scl) {
          this.y = (this.y + this.yspeed * scl) % (height - scl);
       } else {
-         this.y = height - scl*2;
+         this.y = height - scl * 2;
       }
 
    };
@@ -186,3 +199,9 @@ function Snake() {
       rect(this.x, this.y, scl, scl);
    };
 }
+
+
+// A FAIRE : 
+
+// Menu Demarrer: règles / commmandes.
+// Multijoueur

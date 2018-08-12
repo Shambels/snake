@@ -12,6 +12,7 @@ function setup() {
    createCanvas(600, 600);
    snake = new Snake();
    pickLocation();
+   menuS = new MenuS();
 }
 
 function timeIt() {
@@ -66,6 +67,7 @@ function draw() {
       timerStarted = true;
    }
 
+
    if (timer < 60) {
       text("Time : " + timer + "s", width - 4 * scl, height - scl / 3);
    }
@@ -79,18 +81,35 @@ function draw() {
    }
 
    snake.death();
+
    if (snake.isPaused == false) {
       snake.show();
       snake.update();
       fill(255, 0, 100);
       rect(food.x, food.y, scl, scl);
    } else  if (snake.isPaused===true && gameStarted===true) {
+      textAlign(LEFT);
       fill(25);
       tint(25, 127);
       rect(0, height/3, width, height/3);
       fill(80 + sin(frameCount*0.25)*56);
       textSize(111);
       text("PAUSED",width/8, (height+3*scl)/2);
+}
+
+if (gameStarted===false) {
+   
+   // rect(3*scl,7*scl,scl/2,scl/2);
+   menuS.dir(1,0);
+   if (menuS.x>2 && menuS.x<18*scl/3){
+      menuS.total++;
+   }
+   
+   menuS.show();
+   menuS.update();
+   textSize(20);
+   textAlign(CENTER);
+   text("Use ZQSD or arrows to move. P or Space to pause.", width/2, height/2);
 }
 
 }
@@ -103,28 +122,69 @@ function keyPressed() {
       gameStarted = true;
 
 
-   } else if (keyCode === DOWN_ARROW && snake.direction != "up") {
+   } else if ((keyCode === DOWN_ARROW || keyCode === 83) && snake.direction != "up") {
       snake.dir(0, 1);
       snake.direction = "down";
       snake.isPaused = false;
       gameStarted = true;
 
-   } else if (keyCode === LEFT_ARROW && snake.direction != "right") {
+   } else if ((keyCode === LEFT_ARROW || keyCode ===81 ) && snake.direction != "right") {
       snake.dir(-1, 0);
       snake.direction = "left";
       snake.isPaused = false;
       gameStarted = true;
-   } else if (keyCode === RIGHT_ARROW && snake.direction != "left") {
+   } else if ((keyCode === RIGHT_ARROW || keyCode === 68) && snake.direction != "left") {
       snake.dir(1, 0);
       snake.direction = "right";
       snake.isPaused = false;
       gameStarted = true;
-   } else if (keyCode === 80) {
-
+   } else if (keyCode === 80 || keyCode === 32) {
       playPause();
    }
 }
+function MenuS(){
+   this.x=0;
+   this.y=0;
+   this.xspeed = 0;
+   this.yspeed = 0;
+   this.total = 1;
+   this.tail=[];
+   
+   this.dir = function (x,y) {
+      this.xspeed = x;
+      this.yspeed = y;
+   };
 
+   this.update = function () {
+      if (this.total == this.tail.length) {
+         for (var i = 0; i < this.tail.length - 1; i++) {
+            this.tail[i] = this.tail[i + 1];
+         }
+      }
+
+      this.tail[this.total - 1] = createVector(this.x, this.y);
+      if (this.x > 0 - scl/2) {
+         this.x = (this.x + this.xspeed * scl/2) % (width);
+      } else {
+         this.x = width;
+      }
+
+      if (this.y > 0 - scl/2) {
+         this.y = (this.y + this.yspeed * scl/2) % (height - scl/2);
+      } else {
+         this.y = height - scl/2 * 2;
+      }
+
+   };
+
+   this.show = function () {
+      fill(255);
+      for (var i = 0; i < this.tail.length; i++) {
+         rect(this.tail[i].x, this.tail[i].y, scl/2, scl/2);
+      }
+      rect(this.x, this.y, scl/2, scl/2);
+   };
+}
 function Snake() {
    this.x = 0;
    this.y = 0;
@@ -205,3 +265,4 @@ function Snake() {
 
 // Menu Demarrer: règles / commmandes.
 // Multijoueur
+// Boutons
